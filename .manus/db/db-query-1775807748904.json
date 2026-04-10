@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE `tenants` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`name` varchar(255) NOT NULL,\n\t`slug` varchar(64) NOT NULL,\n\t`industry` varchar(128),\n\t`country` varchar(64),\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\t`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `tenants_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `tenants_slug_unique` UNIQUE(`slug`)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user GH7D385sWfUAWVj.470f5706d583 --database Urr4VAgubJ9LAxTwj7vh7i --execute CREATE TABLE `tenants` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`name` varchar(255) NOT NULL,\n\t`slug` varchar(64) NOT NULL,\n\t`industry` varchar(128),\n\t`country` varchar(64),\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\t`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `tenants_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `tenants_slug_unique` UNIQUE(`slug`)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1603
+}
