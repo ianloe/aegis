@@ -1,0 +1,45 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Aegis — AI Governance & Safety Platform  |  Environment Variables Template
+#
+# Usage:
+#   cp env-template.txt .env
+#   # Edit .env and fill in all values marked CHANGE_ME
+#   docker compose up -d
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── MySQL Database ────────────────────────────────────────────────────────────
+MYSQL_ROOT_PASSWORD=CHANGE_ME_root_password
+MYSQL_DATABASE=aegis
+MYSQL_USER=aegis
+MYSQL_PASSWORD=CHANGE_ME_db_password
+MYSQL_EXPOSE_PORT=3306
+
+# ── Application ───────────────────────────────────────────────────────────────
+APP_PORT=3000
+# Generate with: openssl rand -hex 64
+JWT_SECRET=CHANGE_ME_jwt_secret_min_64_chars
+
+# ── Manus OAuth (Authentication) ─────────────────────────────────────────────
+# Obtain from your Manus project settings → App ID
+VITE_APP_ID=CHANGE_ME_manus_app_id
+OAUTH_SERVER_URL=https://api.manus.im
+VITE_OAUTH_PORTAL_URL=https://auth.manus.im
+OWNER_OPEN_ID=CHANGE_ME_owner_open_id
+OWNER_NAME=CHANGE_ME_owner_name
+
+# ── LLM / Forge API ───────────────────────────────────────────────────────────
+# Required for LLM Log Analysis and Compliance Report generation
+BUILT_IN_FORGE_API_URL=https://api.manus.im/forge
+BUILT_IN_FORGE_API_KEY=CHANGE_ME_forge_api_key
+VITE_FRONTEND_FORGE_API_URL=https://api.manus.im/forge
+VITE_FRONTEND_FORGE_API_KEY=CHANGE_ME_frontend_forge_api_key
+
+# ── MinIO (S3-compatible object storage) ─────────────────────────────────────
+MINIO_ROOT_USER=aegisadmin
+MINIO_ROOT_PASSWORD=CHANGE_ME_minio_password
+MINIO_API_PORT=9000
+MINIO_CONSOLE_PORT=9001
+
+# ── Analytics (Optional — leave blank to disable) ────────────────────────────
+VITE_ANALYTICS_ENDPOINT=
+VITE_ANALYTICS_WEBSITE_ID=
