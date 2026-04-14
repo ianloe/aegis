@@ -74,3 +74,13 @@
 - [x] Update DEPLOY.md to reflect self-hosted auth
 - [x] Update vitest tests for new auth procedures
 - [x] Repackage zip for download
+
+## Admin User Management
+- [x] Add db helpers: getAllUsers, updateUserRole, deleteUser, adminResetPassword
+- [x] Add tRPC procedures: users.list, users.create, users.updateRole, users.delete, users.resetPassword (all adminProcedure)
+- [x] Build UserManagement page: table of users with role badge, create user modal, change role, delete, reset password
+- [x] Add Users nav item to AegisLayout (admin-only visibility)
+- [x] Wire /users route in App.tsx
+
+## Bug Fixes
+- [ ] Fix missing getAllUsers, updateUserRole, deleteUser, adminResetPassword functions in server/db.ts (causes "getAllUsers is not defined" error on User Management page)

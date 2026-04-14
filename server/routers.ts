@@ -4,9 +4,11 @@ import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
 import { SESSION_COOKIE, signSession } from "./_core/sdk";
 import { systemRouter } from "./_core/systemRouter";
-import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
+import { adminProcedure, protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import {
+  adminResetPassword,
   countUsers,
+  getUserById,
   createAgent,
   createApprovalRequest,
   createAuditLog,
@@ -41,6 +43,9 @@ import {
   updateComplianceReport,
   updateDataPolicy,
   updateUserLastSignedIn,
+  updateUserRole,
+  deleteUser,
+  getAllUsers,
   upsertShadowAiTool,
 } from "./db";
 import { storagePut } from "./storage";
@@ -727,6 +732,66 @@ Write a 3-4 paragraph executive summary covering: overall compliance posture, ke
         }
 
         return analysis;
+      }),
+  }),
+
+  // ─── Admin User Management ────────────────────────────────────────────────
+  adminUsers: router({
+    list: adminProcedure.query(async () => {
+      return getAllUsers();
+    }),
+
+    create: adminProcedure
+      .input(z.object({
+        username: z.string().min(3).max(64).regex(/^[a-zA-Z0-9_.-]+$/, "Username may only contain letters, numbers, underscores, dots and hyphens"),
+        password: z.string().min(8, "Password must be at least 8 characters"),
+        name: z.string().min(1).max(128).optional(),
+        email: z.string().email().optional(),
+        role: z.enum(["user", "admin"]).default("user"),
+      }))
+      .mutation(async ({ input }) => {
+        const existing = await getUserByUsername(input.username);
+        if (existing) throw new TRPCError({ code: "CONFLICT", message: "Username already taken" });
+        const passwordHash = await bcrypt.hash(input.password, 12);
+        const user = await createUser({
+          username: input.username,
+          passwordHash,
+          name: input.name,
+          email: input.email,
+          role: input.role,
+        });
+        const { passwordHash: _ph, ...safe } = user as any;
+        return safe;
+      }),
+
+    updateRole: adminProcedure
+      .input(z.object({
+        id: z.number(),
+        role: z.enum(["user", "admin"]),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (input.id === ctx.user.id) throw new TRPCError({ code: "BAD_REQUEST", message: "You cannot change your own role" });
+        await updateUserRole(input.id, input.role);
+        return { success: true };
+      }),
+
+    delete: adminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        if (input.id === ctx.user.id) throw new TRPCError({ code: "BAD_REQUEST", message: "You cannot delete your own account" });
+        await deleteUser(input.id);
+        return { success: true };
+      }),
+
+    resetPassword: adminProcedure
+      .input(z.object({
+        id: z.number(),
+        newPassword: z.string().min(8, "Password must be at least 8 characters"),
+      }))
+      .mutation(async ({ input }) => {
+        const passwordHash = await bcrypt.hash(input.newPassword, 12);
+        await adminResetPassword(input.id, passwordHash);
+        return { success: true };
       }),
   }),
 });

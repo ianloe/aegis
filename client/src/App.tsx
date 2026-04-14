@@ -15,6 +15,7 @@ import ShadowAI from "./pages/ShadowAI";
 import VendorTransparency from "./pages/VendorTransparency";
 import LlmAnalysis from "./pages/LlmAnalysis";
 import Notifications from "./pages/Notifications";
+import UserManagement from "./pages/UserManagement";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -36,6 +37,7 @@ function Router() {
       <Route path="/vendor" component={VendorTransparency} />
       <Route path="/analysis" component={LlmAnalysis} />
       <Route path="/notifications" component={Notifications} />
+      <Route path="/users" component={UserManagement} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

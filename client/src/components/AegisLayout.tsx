@@ -20,6 +20,7 @@ import {
   ShieldAlert,
   ShieldCheck,
   TrendingUp,
+  UserCog,
   Users,
 } from "lucide-react";
 import { useState } from "react";
@@ -40,6 +41,7 @@ const navItems = [
   { path: "/analysis", label: "LLM Analysis", icon: Brain, section: "Intelligence" },
   { path: "/compliance", label: "Compliance", icon: ShieldCheck, section: "Intelligence" },
   { path: "/notifications", label: "Notifications", icon: Bell, section: "Intelligence", badge: "unread" },
+  { path: "/users", label: "User Management", icon: UserCog, section: "Admin", adminOnly: true },
 ];
 
 interface AegisLayoutProps {
@@ -90,7 +92,8 @@ export default function AegisLayout({ children, title }: AegisLayoutProps) {
     );
   }
 
-  const sections = Array.from(new Set(navItems.map((n) => n.section)));
+  const visibleItems = navItems.filter((n) => !(n as any).adminOnly || user?.role === "admin");
+  const sections = Array.from(new Set(visibleItems.map((n) => n.section)));
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -122,7 +125,7 @@ export default function AegisLayout({ children, title }: AegisLayoutProps) {
                 <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest px-2 mb-1.5">{section}</p>
               )}
               <div className="space-y-0.5">
-                {navItems
+                {visibleItems
                   .filter((n) => n.section === section)
                   .map((item) => {
                     const isActive = location === item.path || location.startsWith(item.path + "/");
