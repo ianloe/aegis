@@ -3,8 +3,8 @@ set -euo pipefail
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Aegis — Docker Entrypoint
-# Waits for MySQL to be ready, then runs Drizzle migrations before starting
-# the application server.
+# Waits for MySQL to be ready using a pure TCP check (no mysqladmin required),
+# then runs Drizzle migrations before starting the application server.
 # ─────────────────────────────────────────────────────────────────────────────
 
 echo "[entrypoint] Starting Aegis AI Governance Platform..."
@@ -20,14 +20,18 @@ fi
 DB_HOST=$(echo "$DATABASE_URL" | sed -E 's|mysql://[^@]+@([^:/]+).*|\1|')
 DB_PORT=$(echo "$DATABASE_URL" | sed -E 's|mysql://[^@]+@[^:]+:([0-9]+).*|\1|')
 DB_PORT="${DB_PORT:-3306}"
-DB_USER=$(echo "$DATABASE_URL" | sed -E 's|mysql://([^:]+):.*|\1|')
-DB_PASS=$(echo "$DATABASE_URL" | sed -E 's|mysql://[^:]+:([^@]+)@.*|\1|')
-
 echo "[entrypoint] Waiting for MySQL at ${DB_HOST}:${DB_PORT}..."
 
 MAX_ATTEMPTS=60
 ATTEMPT=0
-until mysqladmin ping -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" --silent 2>/dev/null; do
+
+# Pure Node.js TCP check — works without mysqladmin or any MySQL client tools
+until node -e "
+const net = require('net');
+const s = net.createConnection({ host: '${DB_HOST}', port: ${DB_PORT} });
+s.on('connect', () => { s.destroy(); process.exit(0); });
+s.on('error', () => { s.destroy(); process.exit(1); });
+" 2>/dev/null; do
   ATTEMPT=$((ATTEMPT + 1))
   if [[ $ATTEMPT -ge $MAX_ATTEMPTS ]]; then
     echo "[entrypoint] ERROR: MySQL did not become ready after ${MAX_ATTEMPTS} attempts. Aborting."
@@ -41,7 +45,6 @@ echo "[entrypoint] MySQL is ready."
 
 # ── Run Drizzle migrations ────────────────────────────────────────────────────
 echo "[entrypoint] Running database migrations..."
-# Use drizzle-kit migrate to apply any pending migrations
 npx drizzle-kit migrate 2>&1 || {
   echo "[entrypoint] WARNING: drizzle-kit migrate failed or no pending migrations."
 }
