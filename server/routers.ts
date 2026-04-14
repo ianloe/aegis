@@ -1,17 +1,19 @@
 import { TRPCError } from "@trpc/server";
+import bcrypt from "bcryptjs";
 import { z } from "zod";
-import { COOKIE_NAME } from "@shared/const";
-import { getSessionCookieOptions } from "./_core/cookies";
 import { invokeLLM } from "./_core/llm";
+import { SESSION_COOKIE, signSession } from "./_core/sdk";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
 import {
+  countUsers,
   createAgent,
   createApprovalRequest,
   createAuditLog,
   createComplianceReport,
   createDataPolicy,
   createNotification,
+  createUser,
   createVendorEvent,
   ensureTenantMember,
   getAgentById,
@@ -26,6 +28,7 @@ import {
   getOrCreateDefaultTenant,
   getRiskScoreHistory,
   getShadowAiTools,
+  getUserByUsername,
   getVendorEvents,
   markAllNotificationsRead,
   markNotificationRead,
@@ -37,6 +40,7 @@ import {
   updateAgentStatus,
   updateComplianceReport,
   updateDataPolicy,
+  updateUserLastSignedIn,
   upsertShadowAiTool,
 } from "./db";
 import { storagePut } from "./storage";
@@ -60,10 +64,77 @@ export const appRouter = router({
   system: systemRouter,
 
   auth: router({
-    me: publicProcedure.query((opts) => opts.ctx.user),
+    me: publicProcedure.query((opts) => {
+      if (!opts.ctx.user) return null;
+      const { passwordHash: _ph, ...safe } = opts.ctx.user;
+      return safe;
+    }),
+
+    register: publicProcedure
+      .input(z.object({
+        username: z.string().min(3).max(64).regex(/^[a-zA-Z0-9_.-]+$/, "Username may only contain letters, numbers, underscores, dots and hyphens"),
+        password: z.string().min(8, "Password must be at least 8 characters"),
+        name: z.string().min(1).max(128).optional(),
+        email: z.string().email().optional(),
+        inviteCode: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // First user becomes admin automatically; subsequent users require an invite code
+        const existingCount = await countUsers();
+        const isFirstUser = existingCount === 0;
+        const INVITE_CODE = process.env.INVITE_CODE;
+        if (!isFirstUser && INVITE_CODE && input.inviteCode !== INVITE_CODE) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Invalid invite code" });
+        }
+        const existing = await getUserByUsername(input.username);
+        if (existing) throw new TRPCError({ code: "CONFLICT", message: "Username already taken" });
+        const passwordHash = await bcrypt.hash(input.password, 12);
+        const user = await createUser({
+          username: input.username,
+          passwordHash,
+          name: input.name,
+          email: input.email,
+          role: isFirstUser ? "admin" : "user",
+        });
+        const token = await signSession(user.id, user.username);
+        const isSecure = ctx.req.protocol === "https" || (ctx.req.headers["x-forwarded-proto"] === "https");
+        ctx.res.cookie(SESSION_COOKIE, token, {
+          httpOnly: true,
+          secure: isSecure,
+          sameSite: isSecure ? "none" : "lax",
+          maxAge: 365 * 24 * 60 * 60 * 1000,
+          path: "/",
+        });
+        const { passwordHash: _ph, ...safe } = user;
+        return { user: safe, isFirstUser };
+      }),
+
+    login: publicProcedure
+      .input(z.object({
+        username: z.string(),
+        password: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const user = await getUserByUsername(input.username);
+        if (!user) throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid username or password" });
+        const valid = await bcrypt.compare(input.password, user.passwordHash);
+        if (!valid) throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid username or password" });
+        await updateUserLastSignedIn(user.id);
+        const token = await signSession(user.id, user.username);
+        const isSecure = ctx.req.protocol === "https" || (ctx.req.headers["x-forwarded-proto"] === "https");
+        ctx.res.cookie(SESSION_COOKIE, token, {
+          httpOnly: true,
+          secure: isSecure,
+          sameSite: isSecure ? "none" : "lax",
+          maxAge: 365 * 24 * 60 * 60 * 1000,
+          path: "/",
+        });
+        const { passwordHash: _ph, ...safe } = user;
+        return { user: safe };
+      }),
+
     logout: publicProcedure.mutation(({ ctx }) => {
-      const cookieOptions = getSessionCookieOptions(ctx.req);
-      ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
+      ctx.res.clearCookie(SESSION_COOKIE, { path: "/", httpOnly: true });
       return { success: true } as const;
     }),
   }),

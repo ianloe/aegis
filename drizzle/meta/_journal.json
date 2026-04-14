@@ -15,6 +15,13 @@
       "when": 1775807714063,
       "tag": "0001_stale_bill_hollister",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1776130032818,
+      "tag": "0002_cute_tana_nile",
+      "breakpoints": true
     }
   ]
 }

@@ -60,3 +60,17 @@
 - [x] Write vitest tests for core procedures (13 tests passing)
 - [x] Final UI polish pass — spacing, typography, colour consistency
 - [x] Save checkpoint and deliver to user
+
+## Self-Hosted Auth Replacement
+- [x] Add passwordHash column to users table and generate migration SQL
+- [x] Install bcryptjs for password hashing
+- [x] Remove Manus OAuth routes and SDK from server/_core
+- [x] Write new auth procedures: register, login, logout, me (username/password + JWT)
+- [x] Build Login page (username/password form)
+- [x] Build Register page (first-user / invite-only registration)
+- [x] Update useAuth hook to use new auth procedures
+- [x] Update AegisLayout and App.tsx to use new auth flow
+- [x] Remove all Manus OAuth env vars from docker-compose.yml and env-template.txt
+- [x] Update DEPLOY.md to reflect self-hosted auth
+- [x] Update vitest tests for new auth procedures
+- [x] Repackage zip for download

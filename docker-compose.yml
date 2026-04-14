@@ -79,22 +79,18 @@ services:
       # ── Session / JWT ─────────────────────────────────────────────────────
       JWT_SECRET: ${JWT_SECRET}
 
-      # ── Manus OAuth (required for login) ─────────────────────────────────
-      VITE_APP_ID: ${VITE_APP_ID}
-      OAUTH_SERVER_URL: ${OAUTH_SERVER_URL:-https://api.manus.im}
-      VITE_OAUTH_PORTAL_URL: ${VITE_OAUTH_PORTAL_URL:-https://auth.manus.im}
-      OWNER_OPEN_ID: ${OWNER_OPEN_ID}
-      OWNER_NAME: ${OWNER_NAME}
+      # ── Invite code (optional — required for non-first user registration) ──
+      INVITE_CODE: ${INVITE_CODE:-}
 
-      # ── LLM / Forge API (for LLM log analysis and compliance reports) ─────
-      BUILT_IN_FORGE_API_URL: ${BUILT_IN_FORGE_API_URL}
-      BUILT_IN_FORGE_API_KEY: ${BUILT_IN_FORGE_API_KEY}
-      VITE_FRONTEND_FORGE_API_URL: ${VITE_FRONTEND_FORGE_API_URL}
-      VITE_FRONTEND_FORGE_API_KEY: ${VITE_FRONTEND_FORGE_API_KEY}
+      # ── LLM API (optional — for LLM log analysis and compliance reports) ───
+      # Supports any OpenAI-compatible endpoint (OpenAI, Azure OpenAI, Ollama, etc.)
+      LLM_API_URL: ${LLM_API_URL:-https://api.openai.com/v1/chat/completions}
+      LLM_API_KEY: ${LLM_API_KEY:-}
 
-      # ── Analytics (optional) ─────────────────────────────────────────────
-      VITE_ANALYTICS_ENDPOINT: ${VITE_ANALYTICS_ENDPOINT:-}
-      VITE_ANALYTICS_WEBSITE_ID: ${VITE_ANALYTICS_WEBSITE_ID:-}
+      # ── S3-compatible storage (optional — for file exports) ───────────────
+      # Leave blank to use MinIO running in this Compose stack
+      FORGE_API_URL: ${FORGE_API_URL:-http://minio:9000}
+      FORGE_API_KEY: ${FORGE_API_KEY:-}
 
     ports:
       - "${APP_PORT:-3000}:3000"

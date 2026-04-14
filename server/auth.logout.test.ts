@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { appRouter } from "./routers";
-import { COOKIE_NAME } from "../shared/const";
+import { SESSION_COOKIE } from "./_core/sdk";
 import type { TrpcContext } from "./_core/context";
 
 type CookieCall = {
@@ -15,10 +15,10 @@ function createAuthContext(): { ctx: TrpcContext; clearedCookies: CookieCall[] }
 
   const user: AuthenticatedUser = {
     id: 1,
-    openId: "sample-user",
-    email: "sample@example.com",
-    name: "Sample User",
-    loginMethod: "manus",
+    username: "testuser",
+    passwordHash: "$2b$12$placeholder_hash",
+    email: "test@example.com",
+    name: "Test User",
     role: "user",
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -35,7 +35,8 @@ function createAuthContext(): { ctx: TrpcContext; clearedCookies: CookieCall[] }
       clearCookie: (name: string, options: Record<string, unknown>) => {
         clearedCookies.push({ name, options });
       },
-    } as TrpcContext["res"],
+      cookie: () => {},
+    } as unknown as TrpcContext["res"],
   };
 
   return { ctx, clearedCookies };
@@ -50,13 +51,10 @@ describe("auth.logout", () => {
 
     expect(result).toEqual({ success: true });
     expect(clearedCookies).toHaveLength(1);
-    expect(clearedCookies[0]?.name).toBe(COOKIE_NAME);
+    expect(clearedCookies[0]?.name).toBe(SESSION_COOKIE);
     expect(clearedCookies[0]?.options).toMatchObject({
-      maxAge: -1,
-      secure: true,
-      sameSite: "none",
-      httpOnly: true,
       path: "/",
+      httpOnly: true,
     });
   });
 });

@@ -7,10 +7,10 @@ function createMockContext(role: "admin" | "user" = "user"): TrpcContext {
   return {
     user: {
       id: 1,
-      openId: "test-user-001",
+      username: "ian",
+      passwordHash: "$2b$12$placeholder",
       email: "ian@meridian.com",
       name: "Ian Loe",
-      loginMethod: "manus",
       role,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -151,10 +151,10 @@ describe("auth.logout", () => {
     const ctx: TrpcContext = {
       user: {
         id: 1,
-        openId: "test-user",
+        username: "testuser",
+        passwordHash: "$2b$12$placeholder",
         email: "test@example.com",
         name: "Test User",
-        loginMethod: "manus",
         role: "user",
         createdAt: new Date(),
         updatedAt: new Date(),

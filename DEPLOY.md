@@ -63,30 +63,24 @@ All configuration is passed through environment variables in your `.env` file. T
 | Variable | Required | Default | Description |
 |---|---|---|---|
 | `APP_PORT` | No | `3000` | Host port the Aegis application is served on. |
-| `JWT_SECRET` | Yes | — | Secret used to sign session cookies. Must be at least 64 characters. Generate with `openssl rand -hex 64`. |
 
-### Authentication (Manus OAuth)
+### Authentication
 
-Aegis uses Manus OAuth for user authentication. You will need a Manus application ID.
+Aegis uses self-hosted username and password authentication. No external OAuth provider is required. The first user to register via `/register` automatically becomes the administrator.
 
 | Variable | Required | Default | Description |
 |---|---|---|---|
-| `VITE_APP_ID` | Yes | — | Your Manus application ID. |
-| `OAUTH_SERVER_URL` | No | `https://api.manus.im` | Manus OAuth backend URL. |
-| `VITE_OAUTH_PORTAL_URL` | No | `https://auth.manus.im` | Manus login portal URL. |
-| `OWNER_OPEN_ID` | Yes | — | The Manus `openId` of the first admin user. |
-| `OWNER_NAME` | Yes | — | Display name of the first admin user. |
+| `JWT_SECRET` | Yes | — | Secret used to sign session tokens. Generate with `openssl rand -hex 64`. |
+| `INVITE_CODE` | No | *(open)* | If set, all registrations after the first require this code. Recommended for production. |
 
-### LLM / Forge API
+### LLM API (Optional)
 
-Required for the LLM Log Analysis and Compliance Report generation features.
+Required only for the LLM Log Analysis and Compliance Report generation features. Supports any OpenAI-compatible endpoint.
 
-| Variable | Required | Description |
-|---|---|---|
-| `BUILT_IN_FORGE_API_URL` | Yes | Manus Forge API base URL (server-side). |
-| `BUILT_IN_FORGE_API_KEY` | Yes | Bearer token for server-side LLM calls. |
-| `VITE_FRONTEND_FORGE_API_URL` | Yes | Manus Forge API base URL (client-side). |
-| `VITE_FRONTEND_FORGE_API_KEY` | Yes | Bearer token for client-side Forge calls. |
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `LLM_API_URL` | No | `https://api.openai.com/v1/chat/completions` | OpenAI-compatible chat completions endpoint. |
+| `LLM_API_KEY` | No | — | API key for the LLM provider. |
 
 ### MinIO (Object Storage)
 
@@ -212,7 +206,7 @@ This is safe to ignore on subsequent restarts — Drizzle only applies pending m
 Confirm `MINIO_CONSOLE_PORT` is not blocked by a firewall and that the `minio` service is healthy: `docker compose ps minio`.
 
 **LLM Analysis or Compliance Reports return errors.**
-Verify that `BUILT_IN_FORGE_API_KEY` and `BUILT_IN_FORGE_API_URL` are set correctly in your `.env` file.
+Verify that `LLM_API_KEY` and `LLM_API_URL` are set correctly in your `.env` file. If you are using Ollama locally, set `LLM_API_URL=http://host.docker.internal:11434/v1/chat/completions` and leave `LLM_API_KEY` blank.
 
 ---
 

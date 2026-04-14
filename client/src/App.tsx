@@ -16,11 +16,15 @@ import VendorTransparency from "./pages/VendorTransparency";
 import LlmAnalysis from "./pages/LlmAnalysis";
 import Notifications from "./pages/Notifications";
 import Landing from "./pages/Landing";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Landing} />
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/agents" component={AgentRegistry} />
       <Route path="/policies" component={DataPolicies} />
