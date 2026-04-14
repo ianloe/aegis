@@ -83,4 +83,7 @@
 - [x] Wire /users route in App.tsx
 
 ## Bug Fixes
-- [ ] Fix missing getAllUsers, updateUserRole, deleteUser, adminResetPassword functions in server/db.ts (causes "getAllUsers is not defined" error on User Management page)
+- [x] Fix missing getAllUsers, updateUserRole, deleteUser, adminResetPassword functions in server/db.ts (causes "getAllUsers is not defined" error on User Management page)
+- [x] Fix production build: exclude vite.ts from esbuild bundle (--external:./server/_core/vite) to prevent vite import errors on self-hosted server
+- [x] Add server/_core/static.ts to serve static files without importing vite
+- [x] Fix LLM helper: remove Claude-specific thinking parameter, use LLM_API_URL/LLM_API_KEY/LLM_MODEL env vars instead of hardcoded forge API
