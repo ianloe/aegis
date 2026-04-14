@@ -73,10 +73,11 @@ services:
       NODE_ENV: production
       PORT: 3000
 
-      # ── Database ──────────────────────────────────────────────────────────
-      DATABASE_URL: mysql://${MYSQL_USER:-aegis}:${MYSQL_PASSWORD}@db:3306/${MYSQL_DATABASE:-aegis}
+      # ── Database ──────────────────────────────────────────────────────────────
+      # DB_HOST defaults to 'db' (Docker) — Podman users: set DB_HOST to the MySQL container IP
+      DATABASE_URL: mysql://${MYSQL_USER:-aegis}:${MYSQL_PASSWORD}@${DB_HOST:-db}:3306/${MYSQL_DATABASE:-aegis}
 
-      # ── Session / JWT ─────────────────────────────────────────────────────
+      # ── Session / JWT ──────────────────────────────────────────────────────────────
       JWT_SECRET: ${JWT_SECRET}
 
       # ── Invite code (optional — required for non-first user registration) ──
