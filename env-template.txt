@@ -1,0 +1,56 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Aegis — AI Governance & Safety Platform  |  Environment Variables Template
+#
+# Usage:
+#   cp env-template.txt .env
+#   # Edit .env and fill in all values marked CHANGE_ME
+#   docker compose up -d
+#
+# Authentication: username/password with JWT sessions (fully self-hosted).
+# No external OAuth provider required.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── MySQL Database ──────────────────────────────────────────────────────────────
+MYSQL_ROOT_PASSWORD=CHANGE_ME_root_password
+MYSQL_DATABASE=aegis
+MYSQL_USER=aegis
+MYSQL_PASSWORD=CHANGE_ME_db_password
+# Expose MySQL port on the host (change to 3307 if 3306 is already in use)
+MYSQL_EXPOSE_PORT=3306
+
+# DB_HOST: leave as 'db' for standard Docker. For Podman, set this to the
+# MySQL container's IP address (run: podman inspect aegis-db --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}')
+DB_HOST=db
+
+# ── Application ───────────────────────────────────────────────────────────────
+APP_PORT=3000
+
+# JWT signing secret — generate with: openssl rand -hex 64
+JWT_SECRET=CHANGE_ME_jwt_secret_min_64_chars
+
+# ── Registration ──────────────────────────────────────────────────────────────
+# The very first user to register automatically becomes the admin.
+# Set INVITE_CODE to require a code for all subsequent registrations.
+# Leave blank to allow open registration (not recommended for production).
+INVITE_CODE=CHANGE_ME_invite_code
+
+# ── LLM API (Optional — for LLM Log Analysis and Compliance Reports) ─────────
+# Supports any OpenAI-compatible endpoint.
+# Examples:
+#   OpenAI:       https://api.openai.com/v1/chat/completions
+#   Azure OpenAI: https://<resource>.openai.azure.com/openai/deployments/<model>/chat/completions
+#   Ollama:       http://localhost:11434/v1/chat/completions
+LLM_API_URL=https://api.openai.com/v1/chat/completions
+LLM_API_KEY=CHANGE_ME_openai_api_key
+
+# ── MinIO (S3-compatible object storage for file exports) ─────────────────────
+# Used for storing compliance report exports and audit log downloads.
+# Remove the minio service from docker-compose.yml if you supply your own S3 bucket.
+MINIO_ROOT_USER=aegisadmin
+MINIO_ROOT_PASSWORD=CHANGE_ME_minio_password
+MINIO_API_PORT=9000
+MINIO_CONSOLE_PORT=9001
+
+# If using an external S3 bucket instead of MinIO, set these:
+# FORGE_API_URL=https://s3.amazonaws.com
+# FORGE_API_KEY=your_s3_access_key

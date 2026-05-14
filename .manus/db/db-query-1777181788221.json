@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE `discovery_scans` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `tenantId` int NOT NULL,\n  `scanType` enum('endpoint_probe','log_analysis','audit_fingerprint') NOT NULL,\n  `status` enum('running','completed','failed') NOT NULL DEFAULT 'running',\n  `triggeredBy` varchar(255),\n  `inputSummary` text,\n  `findingsCount` int DEFAULT 0,\n  `durationMs` int,\n  `errorMessage` text,\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  `completedAt` timestamp,\n  CONSTRAINT `discovery_scans_id` PRIMARY KEY(`id`)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user GH7D385sWfUAWVj.470f5706d583 --database Urr4VAgubJ9LAxTwj7vh7i --execute CREATE TABLE `discovery_scans` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `tenantId` int NOT NULL,\n  `scanType` enum('endpoint_probe','log_analysis','audit_fingerprint') NOT NULL,\n  `status` enum('running','completed','failed') NOT NULL DEFAULT 'running',\n  `triggeredBy` varchar(255),\n  `inputSummary` text,\n  `findingsCount` int DEFAULT 0,\n  `durationMs` int,\n  `errorMessage` text,\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  `completedAt` timestamp,\n  CONSTRAINT `discovery_scans_id` PRIMARY KEY(`id`)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 3398
+}

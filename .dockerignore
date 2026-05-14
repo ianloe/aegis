@@ -1,0 +1,37 @@
+# ── Node modules (rebuilt inside Docker) ─────────────────────────────────────
+node_modules/
+.pnpm-store/
+
+# ── Build output (generated during Docker build) ──────────────────────────────
+dist/
+
+# ── Development and test files ────────────────────────────────────────────────
+.manus-logs/
+screenshots/
+scripts/
+*.test.ts
+*.spec.ts
+vitest.config.ts
+
+# ── Git and CI ────────────────────────────────────────────────────────────────
+.git/
+.gitignore
+.github/
+
+# ── Editor and OS files ───────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.DS_Store
+*.swp
+*.swo
+Thumbs.db
+
+# ── Local environment files (secrets must be passed via docker compose env) ───
+.env
+.env.local
+.env.*.local
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+pnpm-debug.log*

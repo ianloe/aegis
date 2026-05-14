@@ -1,0 +1,117 @@
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Aegis — AI Governance & Safety Platform
+# Docker Compose stack: app + MySQL + optional S3-compatible storage (MinIO)
+#
+# Quick start:
+#   cp .env.example .env        # fill in your secrets
+#   docker compose up -d        # start all services
+#   docker compose logs -f app  # tail application logs
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── MySQL 8 database ────────────────────────────────────────────────────────
+  db:
+    image: mysql:8.0
+    container_name: aegis-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-aegis}
+      MYSQL_USER: ${MYSQL_USER:-aegis}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - aegis-db-data:/var/lib/mysql
+    ports:
+      - "${MYSQL_EXPOSE_PORT:-3306}:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - aegis-net
+
+  # ── MinIO — S3-compatible object storage (optional, for file exports) ───────
+  # Remove this service if you supply your own S3 bucket via STORAGE_* env vars.
+  minio:
+    image: minio/minio:latest
+    container_name: aegis-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-aegisadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-aegissecret}
+    volumes:
+      - aegis-minio-data:/data
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aegis-net
+
+  # ── Aegis application ───────────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    container_name: aegis-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+
+      # ── Database ──────────────────────────────────────────────────────────────
+      # DB_HOST defaults to 'db' (Docker) — Podman users: set DB_HOST to the MySQL container IP
+      DATABASE_URL: mysql://${MYSQL_USER:-aegis}:${MYSQL_PASSWORD}@${DB_HOST:-db}:3306/${MYSQL_DATABASE:-aegis}
+
+      # ── Session / JWT ──────────────────────────────────────────────────────────────
+      JWT_SECRET: ${JWT_SECRET}
+
+      # ── Invite code (optional — required for non-first user registration) ──
+      INVITE_CODE: ${INVITE_CODE:-}
+
+      # ── LLM API (optional — for LLM log analysis and compliance reports) ───
+      # Supports any OpenAI-compatible endpoint (OpenAI, Azure OpenAI, Ollama, etc.)
+      LLM_API_URL: ${LLM_API_URL:-https://api.openai.com/v1/chat/completions}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+
+      # ── S3-compatible storage (optional — for file exports) ───────────────
+      # Leave blank to use MinIO running in this Compose stack
+      FORGE_API_URL: ${FORGE_API_URL:-http://minio:9000}
+      FORGE_API_KEY: ${FORGE_API_KEY:-}
+
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    networks:
+      - aegis-net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/trpc/auth.me"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+# ── Named volumes ─────────────────────────────────────────────────────────────
+volumes:
+  aegis-db-data:
+    driver: local
+  aegis-minio-data:
+    driver: local
+
+# ── Internal network ──────────────────────────────────────────────────────────
+networks:
+  aegis-net:
+    driver: bridge

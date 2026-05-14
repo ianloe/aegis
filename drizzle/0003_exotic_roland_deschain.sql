@@ -1,0 +1,1 @@
+ALTER TABLE `audit_logs` MODIFY COLUMN `actionType` enum('prompt_sent','response_received','file_read','file_write','file_delete','api_call','email_sent','financial_transaction','login','logout','policy_change','agent_registered','agent_updated','agent_suspended','agent_decommissioned','approval_requested','approval_granted','approval_rejected','anomaly_detected') NOT NULL;

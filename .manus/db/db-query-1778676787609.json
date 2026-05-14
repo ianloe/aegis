@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE `agents` ADD `aaefProfile` varchar(32) DEFAULT 'default';\nALTER TABLE `agents` ADD `aaefWas` decimal(4,2);\nALTER TABLE `agents` ADD `aaefRating` enum('exemplary','proficient','developing','at_risk','unacceptable');\nALTER TABLE `agents` ADD `appraisalCadence` enum('tier1','tier2','tier3') DEFAULT 'tier2';\nALTER TABLE `agents` ADD `nextAppraisalDate` timestamp;\nALTER TABLE `agents` ADD `consecutiveLowWas` int DEFAULT 0;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user GH7D385sWfUAWVj.470f5706d583 --database Urr4VAgubJ9LAxTwj7vh7i --execute ALTER TABLE `agents` ADD `aaefProfile` varchar(32) DEFAULT 'default';\nALTER TABLE `agents` ADD `aaefWas` decimal(4,2);\nALTER TABLE `agents` ADD `aaefRating` enum('exemplary','proficient','developing','at_risk','unacceptable');\nALTER TABLE `agents` ADD `appraisalCadence` enum('tier1','tier2','tier3') DEFAULT 'tier2';\nALTER TABLE `agents` ADD `nextAppraisalDate` timestamp;\nALTER TABLE `agents` ADD `consecutiveLowWas` int DEFAULT 0;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 4711
+}

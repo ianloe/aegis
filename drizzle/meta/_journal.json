@@ -1,0 +1,62 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1775807558227,
+      "tag": "0000_black_sumo",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1775807714063,
+      "tag": "0001_stale_bill_hollister",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1776130032818,
+      "tag": "0002_cute_tana_nile",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1776166589156,
+      "tag": "0003_exotic_roland_deschain",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1777181761611,
+      "tag": "0004_gigantic_spacker_dave",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1778675913840,
+      "tag": "0005_illegal_hex",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1778676771112,
+      "tag": "0006_numerous_gabe_jones",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1778716251113,
+      "tag": "0007_broad_roxanne_simpson",
+      "breakpoints": true
+    }
+  ]
+}
