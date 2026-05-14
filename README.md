@@ -2,7 +2,7 @@
 
 **Aegis** is a self-hosted, open-source AI governance platform designed for enterprises that need to manage, evaluate, and audit AI agents across their organisation. It provides a structured framework for registering AI agents, assessing risk, conducting formal appraisals using the **AI Agent Evaluation Framework (AAEF)**, and detecting shadow AI usage through active network discovery.
 
-Built by [Ian Loe](https://github.com/ianloe) — Managing Director, Group Digital & Technology.
+Built by [Ian Loe](https://github.com/ianloe) — IanLoeTech.
 
 ---
 
@@ -269,7 +269,6 @@ MIT Licence. See `LICENSE` for details.
 ## Author
 
 **Ian Loe**
-Managing Director, Group Digital & Technology
-Adjunct Senior Fellow, Singapore University of Technology and Design (SUTD)
+Managing Director, IanLoeTech
 
 - GitHub: [@ianloe](https://github.com/ianloe)
